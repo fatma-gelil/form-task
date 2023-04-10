@@ -1,28 +1,25 @@
-<?php
-
+<?php /** @noinspection ALL */
+@include 'config.php';
+session_start();
 require "views/header.php";
+if (isset($_POST['submit'])){
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    function validate($data) {
-        $data = trim($data);
-        $data = stripslashes($data);
-        $data = htmlspecialchars($data);
-        return $data;
+
+    $email=mysqli_real_escape_string($connect, $_POST['email']);
+    $password=md5($_POST['password']);
+
+
+    $select="SELECT * FROM user_form WHERE email='$email'&& password='$password'";
+    $result=mysqli_query($connect,$select);
+    if (mysqli_num_rows($result)>0){
+       $row=mysqli_fetch_array($result);
+}else{
+        $error[]="incorrect email or password";
     }
 
-    $email = validate($_POST['email']);
-    $password = validate($_POST['password']);
-
-    if (empty($username) || empty($password)) {
-        $error = 'Please fill in all fields';
-    } else {
-        // Your authentication logic here
-        // valid input
-        echo "valid input";
-    }
-}
 ?>
-<html>
+
+<html lang="">
 <head>
     <title>Login</title>
 </head>
@@ -30,9 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <form method="post" action="Home.php">
     <h2>Login</h2>
-    <?php if($_GET['error']) {?>
-        <p class="error"><?php echo $_GET['error'];?></p>
-    <?php } ?>
+    <?php
+    if (isset($error)){
+        foreach ($error as $error){
+            echo '<span class="error-msg" >.$error.</span>';
+        }
+    }
+}
+
+    ?>
     <label>Email</label>
     <label>
         <input type="email" name="email" placeholder="example@email.com">
